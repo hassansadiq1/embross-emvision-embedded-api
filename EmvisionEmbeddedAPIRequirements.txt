@@ -1,0 +1,26 @@
+altgraph==0.17
+click==7.1.2
+cx-Logging==3.0
+fastapi==0.65.1
+future==0.18.2
+h11==0.12.0
+imageio==2.9.0
+importlib-metadata==4.0.1
+numpy==1.20.3
+opencv-python==4.1.1.26
+openvino==2021.3.0
+paravision-models-zill-openvino @ file:///C:/Users/Embross%20Employee/Emvision%20Embedded/paravision_models_zill_openvino-1.0.0-py3-none-any.whl
+paravision-recognition @ file:///C:/Users/Embross%20Employee/Emvision%20Embedded/paravision_recognition-7.0.0-py3-none-any.whl
+pefile==2021.5.13
+Pillow==8.2.0
+pipfreeze==2.0.3
+pydantic==1.8.2
+pyinstaller==4.3
+pyinstaller-hooks-contrib==2021.1
+python-multipart==0.0.5
+pywin32-ctypes==0.2.0
+six==1.16.0
+starlette==0.14.2
+typing-extensions==3.10.0.0
+uvicorn==0.13.4
+zipp==3.4.1

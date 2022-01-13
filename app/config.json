@@ -1,0 +1,41 @@
+{
+  "face_detection": {
+        "sdk": "paravision",
+        "FACE_SIZE_THRESHOLD": 80,
+        "HEIGHT_PADDING": 50,
+        "WIDTH_PADDING": 40
+    },
+  "camera": {
+      "index": 0,
+      "name": "rgb",
+      "frame_rate": 30,
+      "height": 1080,
+      "width": 1280,
+      "brightness": 0,
+      "contrast": 36,
+      "hue": 0,
+      "saturation": 72,
+      "sharpness": 2,
+      "gamma": 100,
+      "backlight": 1,
+     "rotation_cw": 270
+    },
+  "server": {
+      "host_url": "127.0.0.1",
+      "port_num": 8825
+  },
+  "USERS_DB" : {
+    "developer": {
+        "username": "developer",
+        "hashed_password": "$2b$12$foN4LJWWLpglrWqDGmDD7Oy01NSPxGQ8YpIg5B1fczbqvIZXPMKjW",
+        "disabled": 0
+    }
+},
+  "authentication": {
+    "ACCESS_TOKEN_EXPIRE_MINUTES": 60
+  },
+   "logging": {
+    "level": "INFO",
+     "logs_stored_for_days": 7
+  }
+}
