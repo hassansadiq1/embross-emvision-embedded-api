@@ -1,6 +1,6 @@
 import cv2
 import threading
-from app.utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
+from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
 from time import sleep
 
 outputFrame = None
@@ -31,9 +31,10 @@ class CameraThread(threading.Thread):
         threading.Thread.__init__(self)
         self.camera_config = camera_config
         self.cap = None
+        self.stop = False
 
     def initialize(self):
-        self.cap = cv2.VideoCapture(self.camera_config.id, cv2.CAP_DSHOW)
+        self.cap = cv2.VideoCapture(self.camera_config.id)
         self.cap.set(cv2.CAP_PROP_FPS, self.camera_config.frames_per_sec)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.camera_config.frame_width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.camera_config.frame_height)
@@ -49,6 +50,10 @@ class CameraThread(threading.Thread):
         global camera_status
         self.initialize()
         while True:
+            if self.stop:
+                self.cap.release()
+                return
+
             if self.cap.isOpened():
                 read_status, frame = self.cap.read()
                 if read_status:

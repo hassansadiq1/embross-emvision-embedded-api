@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 import uvicorn
-from app.camera_module.camera import CameraThread
-from app.router.routes import Emvision_API
-from app.utilities.utils import get_software_info
-from app.read_config_file import *
+from camera_module.camera import CameraThread
+from router.routes import Emvision_API
+from utilities.utils import get_software_info
+from read_config_file import *
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
+import signal
+import sys
 
 get_raw_config_data()
 
@@ -16,6 +18,9 @@ app = FastAPI(
     version=get_software_info()
     )
 
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    sys.exit(0)
 
 def setup_logs():
     log_config = get_log_config()
@@ -27,8 +32,8 @@ def setup_logs():
     else:
         logger.setLevel(logging.INFO)
 
-    log_folder = "C:\Logs\EMVISION_API"
-    log_file_name = log_folder + '\EMVISION_API.DBG'
+    log_folder = "EMVISION_API"
+    log_file_name = log_folder + '/EMVISION_API.DBG'
     if not os.path.exists(log_folder):
         os.makedirs(log_folder)
 
@@ -51,8 +56,14 @@ def start_uvicorn_server():
 app.include_router(Emvision_API)
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal_handler)
     setup_logs()
     # create threads
     camera_thread1 = CameraThread(camera_config=get_camera_settings())
+    # camera_thread1.daemon = True
     camera_thread1.start()
     start_uvicorn_server()  # run as thread later
+    camera_thread1.stop = True
+    print("waiting for camera thread")
+    camera_thread1.join()
+    print("everything finished")

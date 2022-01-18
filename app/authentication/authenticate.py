@@ -2,10 +2,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from app.utilities.utils import User, UserInDB, TokenData
+from utilities.utils import User, UserInDB, TokenData
 from datetime import datetime, timedelta
 from typing import Optional
-from app.read_config_file import get_user_db
+from read_config_file import get_user_db
 import bcrypt
 
 SECRET_KEY = "969cf418be856607482ff5b40200f699c6e98ff1af7eb6756a500f826f13c669"

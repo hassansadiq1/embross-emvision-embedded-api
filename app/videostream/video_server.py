@@ -1,5 +1,5 @@
 import threading
-from app.camera_module.camera import Camera
+from camera_module.camera import Camera
 import cv2
 
 thread_lock = threading.Lock()

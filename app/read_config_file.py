@@ -1,5 +1,5 @@
 import json
-from app.utilities.utils import CameraSettings, LogConfig, CroppedFaceSettings
+from utilities.utils import CameraSettings, LogConfig, CroppedFaceSettings
 
 
 raw_json_data: dict

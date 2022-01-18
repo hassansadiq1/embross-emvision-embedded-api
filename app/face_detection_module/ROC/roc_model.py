@@ -1,6 +1,6 @@
 import warnings
 
-import app.utilities.utils as utils
+import utilities.utils as utils
 from python3.roc import *
 import cv2
 from PIL import Image

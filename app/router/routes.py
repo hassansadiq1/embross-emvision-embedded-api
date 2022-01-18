@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Form, HTTPException, Depends, status
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from app.camera_module.camera import Camera
-from app.videostream.video_server import generate_camera_stream
-import app.utilities.utils as utils
-from app.face_detection_module.face_detection import FaceDetection, get_best_shot
-from app.read_config_file import get_port_num, get_host_url, get_authentication_info, get_camera_settings
-import app.authentication.authenticate as security
+from camera_module.camera import Camera
+from videostream.video_server import generate_camera_stream
+import utilities.utils as utils
+from face_detection_module.face_detection import FaceDetection, get_best_shot
+from read_config_file import get_port_num, get_host_url, get_authentication_info, get_camera_settings
+import authentication.authenticate as security
 
 
 Emvision_API = APIRouter()
@@ -20,7 +20,7 @@ Emvision_API = APIRouter()
     response_model=utils.FaceDetectionResult,
     tags=["Camera"]
 )
-def get_face_image(duration: int,
+async def get_face_image(duration: int,
                    current_user: utils.User = Depends(security.get_current_active_user)
                    ):
     if Camera.get_camera_status():
@@ -89,7 +89,7 @@ async def get_camera_list():
     response_model=utils.ImageComparision,
     tags=["1:1 Compare"]
 )
-def compare_images(
+async def compare_images(
     img1_base64: str = Form(...),
     img2_base64: str = Form(...),
     current_user: utils.User = Depends(security.get_current_active_user)

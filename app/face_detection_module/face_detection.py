@@ -1,8 +1,8 @@
 import time
-from app.utilities.utils import FaceDetectionResult
-from app.read_config_file import get_face_detection_sdk
-from app.camera_module.camera import Camera
-from app.utilities.utils import get_datetime
+from utilities.utils import FaceDetectionResult
+from read_config_file import get_face_detection_sdk
+from camera_module.camera import Camera
+from utilities.utils import get_datetime
 import copy
 
 
@@ -10,10 +10,10 @@ FaceDetection = None
 selected_sdk = get_face_detection_sdk()
 
 if selected_sdk == "roc":
-    from app.face_detection_module.ROC.roc_model import ROCFaceDetection
+    from face_detection_module.ROC.roc_model import ROCFaceDetection
     FaceDetection = ROCFaceDetection()
 elif selected_sdk == "paravision":
-    from app.face_detection_module.Paravision.paravision_model import ParavisionFaceDetection
+    from face_detection_module.Paravision.paravision_model import ParavisionFaceDetection
     FaceDetection = ParavisionFaceDetection()
     # raise Exception("Paravision Model is currently not supported")
 else:

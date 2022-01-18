@@ -6,10 +6,10 @@
         "WIDTH_PADDING": 40
     },
   "camera": {
-      "index": 0,
+      "index": "/dev/video0",
       "name": "rgb",
       "frame_rate": 30,
-      "height": 1080,
+      "height": 960,
       "width": 1280,
       "brightness": 0,
       "contrast": 36,

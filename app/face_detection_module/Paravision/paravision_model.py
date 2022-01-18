@@ -1,14 +1,17 @@
 from paravision.recognition import Session, Engine
-import app.utilities.utils as utils
-from app.read_config_file import get_face_settings
-
+import utilities.utils as utils
+from read_config_file import get_face_settings, get_camera_settings
+import numpy as np
 
 FACE_CONFIG = get_face_settings()
 
 
 class ParavisionFaceDetection(object):
     def __init__(self):
-        self.session = Session(engine=Engine.OPENVINO)
+        self.session = Session(engine=Engine.TENSORRT)
+        camera_config = get_camera_settings()
+        self.session.get_faces([np.random.rand(camera_config.frame_width,camera_config.frame_height, 3)], qualities=True)
+
 
     def get_faces(self, _in_image):
         best_face_result = utils.FaceDetectionResult()
@@ -31,6 +34,8 @@ class ParavisionFaceDetection(object):
                 top_left_y = top_left_y - FACE_CONFIG.height_padding
                 bottom_right_y = bottom_right_y + FACE_CONFIG.height_padding
                 top_left_x = top_left_x - FACE_CONFIG.width_padding
+                if (top_left_x < 0):
+                    top_left_x = 0
                 bottom_right_x = bottom_right_x + FACE_CONFIG.width_padding
 
                 cropped_face = utils.crop_face(top_left_x, top_left_y,
@@ -63,6 +68,6 @@ class ParavisionFaceDetection(object):
         compared_results.image1_number_of_faces = len(image1_result.faces)
         compared_results.image2_number_of_faces = len(image1_result.faces)
         compared_results.image1_face_quality = image1_result.faces[0].quality
-        compared_results.image2_face_quality = image1_result.faces[0].quality
+        compared_results.image2_face_quality = image2_result.faces[0].quality
         compared_results.time = utils.get_datetime()
         return compared_results
