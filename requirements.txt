@@ -13,7 +13,7 @@ pywin32-ctypes
 six
 starlette
 typing-extensions
-uvicorn
+uvicorn==0.16.0
 zipp
 Pillow
 imageio
@@ -21,3 +21,4 @@ passlib
 python-jose
 paravision_recognition-7.2.0-py3-none-any.whl
 paravision_models_zill_v2_tensorrt_7.1.3-1.0.0-py3-none-any.whl
+pycuda
