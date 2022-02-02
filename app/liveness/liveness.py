@@ -43,31 +43,29 @@ color_to_depth_extr = color_profile.get_extrinsics_to(depth_stream)
 camera_params = CameraParams(depth_intr, color_intr, color_to_depth_extr)
 
 window = []
-for i in range(10):
-
+for i in range(20):
+    print(i)
     # Wait for a coherent pair of frames: depth and color
     frames = pipeline.wait_for_frames()
     depth_frame = frames.get_depth_frame()
     color_frame = frames.get_color_frame()
     if not depth_frame or not color_frame:
         continue
-
     # Convert images to numpy arrays
     depth_image = np.asanyarray(depth_frame.get_data())
-    color_image = np.asanyarray(color_frame.get_data())
-    
+    color_image = np.asanyarray(color_frame.get_data())    
     # Extract face from rgb image    
     face = session.get_faces([color_image], qualities=True)
-    if len(face.faces) > 1:
-        bounding box = face.faces[0].bounding_box
+    if len(face.faces) > 0:
+        bounding_box = face.faces[0].bounding_box
         # Get depth crop to be fed to liveness model
-        cropped_depth_frame = liveness_session.crop_depth_frame(camera_params, depth_frame, bounding_box)
-        window.appens(cropped_depth_frame)
+        cropped_depth_frame = liveness.crop_depth_frame(camera_params, depth_image, bounding_box)
+        window.append(cropped_depth_frame)
         if len(window) == 5:
             break
 
 # Stop streaming
 pipeline.stop()
-liveness_probability = liveness_session.compute_liveness_probability(window)
+liveness_probability = liveness.compute_liveness_probability(window)
 print("liveness probability: ", liveness_probability)
 
