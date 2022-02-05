@@ -44,7 +44,6 @@ camera_params = CameraParams(depth_intr, color_intr, color_to_depth_extr)
 
 window = []
 for i in range(20):
-    print(i)
     # Wait for a coherent pair of frames: depth and color
     frames = pipeline.wait_for_frames()
     depth_frame = frames.get_depth_frame()
@@ -57,6 +56,7 @@ for i in range(20):
     # Extract face from rgb image    
     face = session.get_faces([color_image], qualities=True)
     if len(face.faces) > 0:
+        print("Face detected")
         bounding_box = face.faces[0].bounding_box
         # Get depth crop to be fed to liveness model
         cropped_depth_frame = liveness.crop_depth_frame(camera_params, depth_image, bounding_box)

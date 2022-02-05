@@ -31,6 +31,7 @@ def get_camera_settings():
         camera_config.gamma = raw_json_data["camera"].get("gamma")
         camera_config.backlight = raw_json_data["camera"].get("backlight")
         camera_config.rotation = raw_json_data["camera"].get("rotation_cw")
+        camera_config.liveness = raw_json_data["camera"].get("liveness")
     else:
         raise Exception("config.jason file is None")
 

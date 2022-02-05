@@ -27,6 +27,7 @@ class CameraSettings(BaseModel):
     rotation: int = 0
     online: bool = False
     enabled: bool = True
+    liveness: int = 0
 
 
 class AppConfig:

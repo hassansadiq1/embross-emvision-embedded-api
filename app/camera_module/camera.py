@@ -1,11 +1,13 @@
 import cv2
 import threading
 from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
-from time import sleep
-
+from paravision.liveness import CameraParams
+import numpy as np
 outputFrame = None
+depthFrame = None
 thread_lock = threading.Lock()
 camera_status = None
+camera_params = None
 
 
 class Camera:
@@ -32,6 +34,7 @@ class CameraThread(threading.Thread):
         self.camera_config = camera_config
         self.cap = None
         self.stop = False
+        self.pipeline = None
 
     def initialize(self):
         self.cap = cv2.VideoCapture(self.camera_config.id)
@@ -46,9 +49,8 @@ class CameraThread(threading.Thread):
         self.cap.set(cv2.CAP_PROP_GAMMA, self.camera_config.gamma)
         self.cap.set(cv2.CAP_PROP_BACKLIGHT, self.camera_config.backlight)
 
-    def run(self):
+    def runCam(self):
         global camera_status
-        self.initialize()
         while True:
             if self.stop:
                 self.cap.release()
@@ -73,3 +75,79 @@ class CameraThread(threading.Thread):
             else:
                 camera_status = False
                 self.initialize()
+
+    def initializeRealsense(self):
+        import pyrealsense2 as rs
+
+        # Configure depth and color streams
+        self.pipeline = rs.pipeline()
+        config = rs.config()
+
+        # Get device product line for setting a supporting resolution
+        pipeline_wrapper = rs.pipeline_wrapper(self.pipeline)
+        pipeline_profile = config.resolve(pipeline_wrapper)
+        device = pipeline_profile.get_device()
+
+        found_rgb = False
+        for s in device.sensors:
+            if s.get_info(rs.camera_info.name) == 'RGB Camera':
+                found_rgb = True
+                break
+
+        if not found_rgb:
+            print("The demo requires Depth camera with Color sensor")
+            return False
+
+        config.enable_stream(rs.stream.depth,
+                             self.camera_config.frame_width, self.camera_config.frame_height,
+                             rs.format.z16, self.camera_config.frames_per_sec)
+        config.enable_stream(rs.stream.color,
+                             self.camera_config.frame_width, self.camera_config.frame_height,
+                             rs.format.bgr8, self.camera_config.frames_per_sec)
+
+        # Start streaming
+        profile = self.pipeline.start(config)
+
+        depth_stream = profile.get_stream(rs.stream.depth)
+        color_stream = profile.get_stream(rs.stream.color)
+        depth_profile = depth_stream.as_video_stream_profile()
+        color_profile = color_stream.as_video_stream_profile()
+        depth_intr = depth_profile.get_intrinsics()
+        color_intr = color_profile.get_intrinsics()
+        color_to_depth_extr = color_profile.get_extrinsics_to(depth_stream)
+        global camera_params
+        camera_params = CameraParams(depth_intr, color_intr, color_to_depth_extr)
+        return True
+
+    def runRealsenseCam(self):
+        global camera_status
+        global outputFrame, depthFrame
+
+        while True:
+            if self.stop:
+                self.pipeline.stop()
+                return
+
+            frames = self.pipeline.wait_for_frames()
+            depth_frame = frames.get_depth_frame()
+            color_frame = frames.get_color_frame()
+            if not depth_frame or not color_frame:
+                continue
+            else:
+                camera_status = True
+
+            # Convert images to numpy arrays
+            depth_image = np.asanyarray(depth_frame.get_data())
+            color_image = np.asanyarray(color_frame.get_data())
+            with thread_lock:
+                outputFrame = color_image.copy()
+                depthFrame = depth_image.copy()
+
+    def run(self):
+        if self.camera_config.liveness:
+            self.initializeRealsense()
+            self.runRealsenseCam()
+        else:
+            self.initialize()
+            self.runCam()
+        return
