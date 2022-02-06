@@ -3,13 +3,14 @@
         "sdk": "paravision",
         "FACE_SIZE_THRESHOLD": 80,
         "HEIGHT_PADDING": 50,
-        "WIDTH_PADDING": 40
+        "WIDTH_PADDING": 40,
+        "LIVENESS_WINDOW": 10
     },
   "camera": {
       "index": "/dev/video0",
       "name": "rgb",
       "frame_rate": 30,
-      "height": 960,
+      "height": 720,
       "width": 1280,
       "brightness": 0,
       "contrast": 36,

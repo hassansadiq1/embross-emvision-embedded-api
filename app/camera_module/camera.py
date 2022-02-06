@@ -3,6 +3,8 @@ import threading
 from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
 from paravision.liveness import CameraParams
 import numpy as np
+import pyrealsense2 as rs
+
 outputFrame = None
 depthFrame = None
 thread_lock = threading.Lock()
@@ -25,6 +27,14 @@ class Camera:
     @staticmethod
     def get_camera_status():
         return camera_status
+
+    @staticmethod
+    def get_current_depth_frame():
+        return outputFrame, depthFrame
+
+    @staticmethod
+    def get_camera_params():
+        return camera_params
 
 
 # This thread captures image continuously
@@ -77,8 +87,8 @@ class CameraThread(threading.Thread):
                 self.initialize()
 
     def initializeRealsense(self):
-        import pyrealsense2 as rs
 
+        global camera_status
         # Configure depth and color streams
         self.pipeline = rs.pipeline()
         config = rs.config()
@@ -96,6 +106,7 @@ class CameraThread(threading.Thread):
 
         if not found_rgb:
             print("The demo requires Depth camera with Color sensor")
+            camera_status = False
             return False
 
         config.enable_stream(rs.stream.depth,
@@ -106,8 +117,14 @@ class CameraThread(threading.Thread):
                              rs.format.bgr8, self.camera_config.frames_per_sec)
 
         # Start streaming
+        profile = None
         profile = self.pipeline.start(config)
-
+        if profile:
+            print("camera is live")
+        else:
+            camera_status = False
+            print("unable to initialize camera")
+            return False
         depth_stream = profile.get_stream(rs.stream.depth)
         color_stream = profile.get_stream(rs.stream.color)
         depth_profile = depth_stream.as_video_stream_profile()
@@ -117,6 +134,7 @@ class CameraThread(threading.Thread):
         color_to_depth_extr = color_profile.get_extrinsics_to(depth_stream)
         global camera_params
         camera_params = CameraParams(depth_intr, color_intr, color_to_depth_extr)
+        camera_status = True
         return True
 
     def runRealsenseCam(self):
@@ -133,8 +151,6 @@ class CameraThread(threading.Thread):
             color_frame = frames.get_color_frame()
             if not depth_frame or not color_frame:
                 continue
-            else:
-                camera_status = True
 
             # Convert images to numpy arrays
             depth_image = np.asanyarray(depth_frame.get_data())
