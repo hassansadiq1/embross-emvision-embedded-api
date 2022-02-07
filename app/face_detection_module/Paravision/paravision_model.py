@@ -120,14 +120,13 @@ class ParavisionFaceDetection(object):
                         best_face_result.box_x = int(detection_result.faces[0].bounding_box.top_left.x)
                         best_face_result.box_y = int(detection_result.faces[0].bounding_box.top_left.y)
                         best_face_result.base64 = utils.convert_image_to_base64(cropped_face)
+                        break
 
-                    break
         if len(window) == 5:
             liveness_probability = self.liveness.compute_liveness_probability(window)
             if liveness_probability > FACE_CONFIG.liveness_threshold:
                 best_face_result.liveness = liveness_probability
             else:
                 best_face_result = utils.FaceDetectionResult()
-                best_face_result.liveness = -1
 
         return best_face_result
