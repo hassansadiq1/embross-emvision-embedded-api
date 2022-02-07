@@ -58,6 +58,7 @@ def get_face_settings():
     cropped_face_config.height_padding = raw_json_data["face_detection"].get("HEIGHT_PADDING")
     cropped_face_config.width_padding = raw_json_data["face_detection"].get("WIDTH_PADDING")
     cropped_face_config.liveness_window = raw_json_data["face_detection"].get("LIVENESS_WINDOW")
+    cropped_face_config.liveness_threshold = raw_json_data["face_detection"].get("LIVENESS_THRESHOLD")
     return cropped_face_config
 
 

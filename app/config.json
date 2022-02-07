@@ -4,7 +4,8 @@
         "FACE_SIZE_THRESHOLD": 80,
         "HEIGHT_PADDING": 50,
         "WIDTH_PADDING": 40,
-        "LIVENESS_WINDOW": 10
+        "LIVENESS_WINDOW": 10,
+        "LIVENESS_THRESHOLD": 0.5
     },
   "camera": {
       "index": "/dev/video0",

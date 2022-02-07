@@ -79,6 +79,7 @@ class CroppedFaceSettings(BaseModel):
     height_padding: int = 0
     width_padding: int = 0
     liveness_window: int = 5
+    liveness_threshold: float = 0.5
 
 
 # Raw camera image format

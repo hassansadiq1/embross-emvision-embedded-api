@@ -82,17 +82,17 @@ class ParavisionFaceDetection(object):
             frame, depth_frame = Camera.get_current_depth_frame()
             detection_result = self.session.get_faces([frame], qualities=True)
             if len(detection_result.faces) > 0:
-                bounding_box = detection_result.faces[0].bounding_box
-                cropped_depth_frame = self.liveness.crop_depth_frame(camera_params, depth_frame, bounding_box)
-                window.append(cropped_depth_frame)
-                if len(window) == 5:
-                    left_eye_x = detection_result.faces[0].landmarks.left_eye.x
-                    left_eye_y = detection_result.faces[0].landmarks.left_eye.y
-                    right_eye_x = detection_result.faces[0].landmarks.right_eye.x
-                    right_eye_y = detection_result.faces[0].landmarks.right_eye.y
-                    # find distance between eyes. This will help to determine the distance from user to kiosk
-                    face_size = utils.get_distance_between_two_pints(left_eye_x, left_eye_y, right_eye_x, right_eye_y)
-                    if face_size > FACE_CONFIG.face_size_threshold:
+                left_eye_x = detection_result.faces[0].landmarks.left_eye.x
+                left_eye_y = detection_result.faces[0].landmarks.left_eye.y
+                right_eye_x = detection_result.faces[0].landmarks.right_eye.x
+                right_eye_y = detection_result.faces[0].landmarks.right_eye.y
+                # find distance between eyes. This will help to determine the distance from user to kiosk
+                face_size = utils.get_distance_between_two_pints(left_eye_x, left_eye_y, right_eye_x, right_eye_y)
+                if face_size > FACE_CONFIG.face_size_threshold:
+                    bounding_box = detection_result.faces[0].bounding_box
+                    cropped_depth_frame = self.liveness.crop_depth_frame(camera_params, depth_frame, bounding_box)
+                    window.append(cropped_depth_frame)
+                    if len(window) == 5:
                         top_left_x = int(detection_result.faces[0].bounding_box.top_left.x)
                         top_left_y = int(detection_result.faces[0].bounding_box.top_left.y)
                         bottom_right_x = int(detection_result.faces[0].bounding_box.bottom_right.x)
@@ -124,6 +124,10 @@ class ParavisionFaceDetection(object):
                     break
         if len(window) == 5:
             liveness_probability = self.liveness.compute_liveness_probability(window)
-            best_face_result.liveness = liveness_probability
+            if liveness_probability > FACE_CONFIG.liveness_threshold:
+                best_face_result.liveness = liveness_probability
+            else:
+                best_face_result = utils.FaceDetectionResult()
+                best_face_result.liveness = -1
 
         return best_face_result
