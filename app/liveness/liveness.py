@@ -3,6 +3,7 @@ from paravision.recognition import Session, Engine
 import pyrealsense2 as rs
 from paravision.liveness import CameraParams
 import numpy as np
+import cv2
 
 session = Session(engine=Engine.TENSORRT)
 liveness = Liveness(settings={"max_batch_size": 1})
@@ -26,8 +27,8 @@ for s in device.sensors:
 if not found_rgb:
     print("The demo requires Depth camera with Color sensor")
 
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
 
 # Start streaming
 profile = pipeline.start(config)
@@ -52,12 +53,22 @@ for i in range(20):
         continue
     # Convert images to numpy arrays
     depth_image = np.asanyarray(depth_frame.get_data())
-    color_image = np.asanyarray(color_frame.get_data())    
-    # Extract face from rgb image    
+    color_image = np.asanyarray(color_frame.get_data())
+    cv2.imwrite(str(i) + "_rgb.jpg", color_image)
+    cv2.imwrite(str(i) + "_depth.jpg", depth_image)
+    # Extract face from rgb image
     face = session.get_faces([color_image], qualities=True)
     if len(face.faces) > 0:
         print("Face detected")
         bounding_box = face.faces[0].bounding_box
+        top_left_x = int(face.faces[0].bounding_box.top_left.x)
+        top_left_y = int(face.faces[0].bounding_box.top_left.y)
+        bottom_right_x = int(face.faces[0].bounding_box.bottom_right.x)
+        bottom_right_y = int(face.faces[0].bounding_box.bottom_right.y)
+        crop_rgb = color_image[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
+        crop_depth = depth_image[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
+        cv2.imwrite(str(i) + "_crop_rgb.jpg", crop_rgb)
+        cv2.imwrite(str(i) + "_crop_depth.jpg", crop_depth)
         # Get depth crop to be fed to liveness model
         cropped_depth_frame = liveness.crop_depth_frame(camera_params, depth_image, bounding_box)
         window.append(cropped_depth_frame)
