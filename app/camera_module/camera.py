@@ -128,6 +128,17 @@ class CameraThread(threading.Thread):
                 camera_status = False
                 print("unable to initialize camera")
                 return False
+
+            # setting camera properties
+            color_sensor = profile.get_device().first_color_sensor()
+            color_sensor.set_option(rs.option.brightness, self.camera_config.brightness)
+            color_sensor.set_option(rs.option.contrast, self.camera_config.contrast)
+            color_sensor.set_option(rs.option.hue, self.camera_config.hue)
+            color_sensor.set_option(rs.option.saturation, self.camera_config.saturation)
+            color_sensor.set_option(rs.option.sharpness, self.camera_config.sharpness)
+            color_sensor.set_option(rs.option.gamma, self.camera_config.gamma)
+            color_sensor.set_option(rs.option.backlight_compensation, self.camera_config.backlight)
+
             depth_stream = profile.get_stream(rs.stream.depth)
             color_stream = profile.get_stream(rs.stream.color)
             depth_profile = depth_stream.as_video_stream_profile()
