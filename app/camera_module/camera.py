@@ -92,6 +92,11 @@ class CameraThread(threading.Thread):
         camera_status = False
         ctx = rs.context()
         if len(ctx.devices) > 0:
+            # resetting device
+            devices = ctx.query_devices()
+            for dev in devices:
+                dev.hardware_reset()
+
             # Configure depth and color streams
             self.pipeline = rs.pipeline()
             config = rs.config()
@@ -165,23 +170,24 @@ class CameraThread(threading.Thread):
                     frames = self.pipeline.wait_for_frames()
                     depth_frame = frames.get_depth_frame()
                     color_frame = frames.get_color_frame()
+                    # Convert images to numpy arrays
+                    depth_image = np.asanyarray(depth_frame.get_data())
+                    color_image = np.asanyarray(color_frame.get_data())
+
                     if not depth_frame or not color_frame:
                         camera_status = False
                         self.initialize()
                         continue
                     if self.camera_config.rotation == 90:
-                        color_frame = cv2.rotate(color_frame, 0)
-                        depth_frame = cv2.rotate(depth_frame, 0)
+                        color_image = cv2.rotate(color_image, 0)
+                        depth_image = cv2.rotate(depth_image, 0)
                     elif self.camera_config.rotation == 180:
-                        color_frame = cv2.rotate(color_frame, 1)
-                        depth_frame = cv2.rotate(depth_frame, 1)
+                        color_image = cv2.rotate(color_image, 1)
+                        depth_image = cv2.rotate(depth_image, 1)
                     elif self.camera_config.rotation == 270:
-                        color_frame = cv2.rotate(color_frame, 2)
-                        depth_frame = cv2.rotate(depth_frame, 2)
+                        color_image = cv2.rotate(color_image, 2)
+                        depth_image = cv2.rotate(depth_image, 2)
 
-                    # Convert images to numpy arrays
-                    depth_image = np.asanyarray(depth_frame.get_data())
-                    color_image = np.asanyarray(color_frame.get_data())
                     with thread_lock:
                         outputFrame = color_image.copy()
                         depthFrame = depth_image.copy()
