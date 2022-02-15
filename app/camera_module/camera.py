@@ -160,23 +160,36 @@ class CameraThread(threading.Thread):
                 self.pipeline.stop()
                 return
 
-            if camera_status:
-                frames = self.pipeline.wait_for_frames()
-                depth_frame = frames.get_depth_frame()
-                color_frame = frames.get_color_frame()
-                if not depth_frame or not color_frame:
-                    camera_status = False
-                    self.initialize()
-                    continue
+            try:
+                if camera_status:
+                    frames = self.pipeline.wait_for_frames()
+                    depth_frame = frames.get_depth_frame()
+                    color_frame = frames.get_color_frame()
+                    if not depth_frame or not color_frame:
+                        camera_status = False
+                        self.initialize()
+                        continue
+                    if self.camera_config.rotation == 90:
+                        color_frame = cv2.rotate(color_frame, 0)
+                        depth_frame = cv2.rotate(depth_frame, 0)
+                    elif self.camera_config.rotation == 180:
+                        color_frame = cv2.rotate(color_frame, 1)
+                        depth_frame = cv2.rotate(depth_frame, 1)
+                    elif self.camera_config.rotation == 270:
+                        color_frame = cv2.rotate(color_frame, 2)
+                        depth_frame = cv2.rotate(depth_frame, 2)
 
-                # Convert images to numpy arrays
-                depth_image = np.asanyarray(depth_frame.get_data())
-                color_image = np.asanyarray(color_frame.get_data())
-                with thread_lock:
-                    outputFrame = color_image.copy()
-                    depthFrame = depth_image.copy()
-            else:
-                self.initializeRealsense()
+                    # Convert images to numpy arrays
+                    depth_image = np.asanyarray(depth_frame.get_data())
+                    color_image = np.asanyarray(color_frame.get_data())
+                    with thread_lock:
+                        outputFrame = color_image.copy()
+                        depthFrame = depth_image.copy()
+                else:
+                    self.initializeRealsense()
+            except:
+                self.pipeline.stop()
+                camera_status = False
 
     def run(self):
         if self.camera_config.liveness:
