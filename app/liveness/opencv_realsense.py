@@ -9,6 +9,12 @@ import pyrealsense2 as rs
 import numpy as np
 import cv2
 
+ctx = rs.context()
+if len(ctx.devices) > 0:
+    # resetting device
+    devices = ctx.query_devices()
+    for dev in devices:
+        dev.hardware_reset()
 # Configure depth and color streams
 pipeline = rs.pipeline()
 config = rs.config()
