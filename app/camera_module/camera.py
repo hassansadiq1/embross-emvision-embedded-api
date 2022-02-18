@@ -93,9 +93,9 @@ class CameraThread(threading.Thread):
         ctx = rs.context()
         if len(ctx.devices) > 0:
             # resetting device
-            devices = ctx.query_devices()
-            for dev in devices:
-                dev.hardware_reset()
+            # devices = ctx.query_devices()
+            # for dev in devices:
+            #     dev.hardware_reset()
 
             # Configure depth and color streams
             self.pipeline = rs.pipeline()
