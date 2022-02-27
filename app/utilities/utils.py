@@ -27,6 +27,7 @@ class CameraSettings(BaseModel):
     rotation: int = 0
     online: bool = False
     enabled: bool = True
+    liveness: int = 0
 
 
 class AppConfig:
@@ -77,6 +78,8 @@ class CroppedFaceSettings(BaseModel):
     face_size_threshold: int = 0
     height_padding: int = 0
     width_padding: int = 0
+    liveness_window: int = 5
+    liveness_threshold: float = 0.5
 
 
 # Raw camera image format
