@@ -12,6 +12,12 @@ echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
 echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc 
 source ~/.bashrc
 ```
+Build and install intel real sense
+```bash
+git clone https://github.com/JetsonHacksNano/installLibrealsense
+./buildLibrealsense.sh -v v2.48.0
+````
+
 ## 2 Python VENV
 ```bash
 python3 -m venv ./env --system-site-packages
@@ -22,6 +28,8 @@ Copy paravision python wheel files and correct path of these files in requiremen
 ```bash
 pip install -r requirements.txt
 ```
+Copy python wrapper lib file of intel real sense installed earlier to this virtual environment
+
 Run app
 ```bash
 cd embross-emvision-embedded-api/app/
