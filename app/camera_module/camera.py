@@ -4,6 +4,7 @@ from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, Cam
 from paravision.liveness import CameraParams
 import numpy as np
 import pyrealsense2 as rs
+import time
 
 outputFrame = None
 depthFrame = None
@@ -84,6 +85,7 @@ class CameraThread(threading.Thread):
                     camera_status = False
             else:
                 camera_status = False
+                time.sleep(0.2)
                 self.initialize()
 
     def initializeRealsense(self):
@@ -192,6 +194,7 @@ class CameraThread(threading.Thread):
                         outputFrame = color_image.copy()
                         depthFrame = depth_image.copy()
                 else:
+                    time.sleep(0.2)
                     self.initializeRealsense()
             except:
                 self.pipeline.stop()
