@@ -16,6 +16,7 @@ Build and install intel real sense
 ```bash
 git clone https://github.com/JetsonHacksNano/installLibrealsense
 ./buildLibrealsense.sh -v v2.48.0
+sudo cp /home/"$USER"/librealsense/wrappers/python/pyrealsense2/__init__.py /usr/local/lib/python3.6/pyrealsense2/
 ````
 
 ## 2 Python VENV
@@ -28,8 +29,12 @@ Copy paravision python wheel files and correct path of these files in requiremen
 ```bash
 pip install -r requirements.txt
 ```
-Copy python wrapper lib file of intel real sense installed earlier to this virtual environment
+Copy python wrapper lib file of intel real sense installed earlier to this virtual environment.
 
+Update $path to virtual environment path in below command.
+```bash
+cp -r /usr/local/lib/python3.6/pyrealsense2 $path/env/lib/python3.6/site-packages/
+```
 Run app
 ```bash
 cd embross-emvision-embedded-api/app/
