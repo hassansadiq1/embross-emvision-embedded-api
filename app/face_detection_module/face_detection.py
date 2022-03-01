@@ -1,6 +1,6 @@
 import time
 from utilities.utils import FaceDetectionResult
-from read_config_file import get_face_detection_sdk, get_camera_settings
+from read_config_file import get_face_detection_sdk, get_camera_settings, get_face_settings
 from camera_module.camera import Camera
 from utilities.utils import get_datetime
 import copy
@@ -8,10 +8,11 @@ import copy
 FaceDetection = None
 selected_sdk = get_face_detection_sdk()
 camera = get_camera_settings()
+face = get_face_settings()
 
 if selected_sdk == "roc":
     from face_detection_module.ROC.roc_model import ROCFaceDetection
-    FaceDetection = ROCFaceDetection()
+    FaceDetection = ROCFaceDetection(face)
 elif selected_sdk == "paravision":
     from face_detection_module.Paravision.paravision_model import ParavisionFaceDetection
     FaceDetection = ParavisionFaceDetection()

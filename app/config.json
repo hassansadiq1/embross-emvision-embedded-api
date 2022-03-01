@@ -1,6 +1,6 @@
 {
   "face_detection": {
-        "sdk": "paravision",
+        "sdk": "roc",
         "FACE_SIZE_THRESHOLD": 80,
         "HEIGHT_PADDING": 50,
         "WIDTH_PADDING": 40,
@@ -8,11 +8,11 @@
         "LIVENESS_THRESHOLD": 0.5
     },
   "camera": {
-      "index": "/dev/video0",
+      "index": "/dev/video1",
       "name": "rgb",
-      "frame_rate": 30,
-      "height": 720,
-      "width": 1280,
+      "frame_rate": 10,
+      "height": 480,
+      "width": 640,
       "brightness": 0,
       "contrast": 36,
       "hue": 0,
@@ -21,10 +21,10 @@
       "gamma": 100,
       "backlight": 1,
      "rotation_cw": 270,
-      "liveness": 1
+      "liveness": 0
     },
   "server": {
-      "host_url": "127.0.0.1",
+      "host_url": "0.0.0.0",
       "port_num": 8825
   },
   "USERS_DB" : {

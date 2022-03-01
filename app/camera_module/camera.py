@@ -1,7 +1,6 @@
 import cv2
 import threading
 from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
-from paravision.liveness import CameraParams
 import numpy as np
 import pyrealsense2 as rs
 import time
@@ -90,6 +89,7 @@ class CameraThread(threading.Thread):
 
     def initializeRealsense(self):
 
+        from paravision.liveness import CameraParams
         global camera_status
         camera_status = False
         ctx = rs.context()
