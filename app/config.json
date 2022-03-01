@@ -10,7 +10,7 @@
   "camera": {
       "index": "/dev/video0",
       "name": "rgb",
-      "frame_rate": 30,
+      "frame_rate": 10,
       "height": 720,
       "width": 1280,
       "brightness": 0,
@@ -21,10 +21,10 @@
       "gamma": 100,
       "backlight": 1,
      "rotation_cw": 270,
-      "liveness": 1
+      "liveness": 0
     },
   "server": {
-      "host_url": "127.0.0.1",
+      "host_url": "0.0.0.0",
       "port_num": 8825
   },
   "USERS_DB" : {

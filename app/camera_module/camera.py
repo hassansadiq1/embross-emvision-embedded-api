@@ -1,6 +1,7 @@
 import cv2
 import threading
 from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
+from paravision.recognition import Session, Engine
 from paravision.liveness import CameraParams
 import numpy as np
 import pyrealsense2 as rs
@@ -43,6 +44,7 @@ class CameraThread(threading.Thread):
     def __init__(self, camera_config: CameraSettings):
         threading.Thread.__init__(self)
         self.camera_config = camera_config
+        self.session = Session(engine=Engine.TENSORRT)
         self.cap = None
         self.stop = False
         self.pipeline = None
@@ -80,6 +82,9 @@ class CameraThread(threading.Thread):
                             frame = cv2.rotate(frame, 2)
                         global outputFrame
                         outputFrame = frame.copy()
+                        detection_result = self.session.get_faces([frame])
+                        if len(detection_result.faces):
+                            print("Left: ", detection_result.faces[0].bounding_box.top_left.x)
                 else:
                     self.cap.release()
                     camera_status = False
