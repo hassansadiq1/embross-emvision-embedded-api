@@ -20,6 +20,11 @@ else:
     raise Exception("No such Face Detection SDK Found")
 
 
+def detectFace():
+    while True:
+        FaceDetection.detect_face(Camera.get_current_frame())
+
+
 def get_best_shot(duration):
     best_result = FaceDetectionResult()
     if duration == 0:

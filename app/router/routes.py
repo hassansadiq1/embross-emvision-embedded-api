@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from camera_module.camera import Camera
 from videostream.video_server import generate_camera_stream
 import utilities.utils as utils
-from face_detection_module.face_detection import FaceDetection, get_best_shot
+from face_detection_module.face_detection import FaceDetection, get_best_shot, detectFace
 from read_config_file import get_port_num, get_host_url, get_authentication_info, get_camera_settings
 import authentication.authenticate as security
 
@@ -27,6 +27,23 @@ async def get_face_image(duration: int,
         frame = Camera.get_current_frame()
         if frame is not None:
             return get_best_shot(duration)
+    else:
+        raise HTTPException(status_code=404, detail="Camera offline")
+
+
+@Emvision_API.get(
+    "/camera/continuous",
+    summary="Apply Face detection continuously on new frames",
+    description="Capture frames from the camera and apply face detection.",
+    response_model=utils.VideoStream,
+    tags=["Camera"]
+)
+async def detect_face(current_user: utils.User = Depends(security.get_current_active_user)):
+    if Camera.get_camera_status():
+        frame = Camera.get_current_frame()
+        if frame is not None:
+            detectFace()
+            return {"face": "detection", "time": utils.get_datetime()}
     else:
         raise HTTPException(status_code=404, detail="Camera offline")
 

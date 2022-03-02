@@ -13,7 +13,8 @@ class ParavisionFaceDetection(object):
         self.session = Session(engine=Engine.TENSORRT)
         camera_config = get_camera_settings()
         self.session.get_faces([np.random.rand(camera_config.frame_width,camera_config.frame_height, 3)], qualities=True)
-        self.liveness = Liveness(settings={"max_batch_size": 1})
+        if camera_config.liveness:
+            self.liveness = Liveness(settings={"max_batch_size": 1})
 
     def get_faces(self, _in_image):
         best_face_result = utils.FaceDetectionResult()
@@ -130,3 +131,21 @@ class ParavisionFaceDetection(object):
                 best_face_result = utils.FaceDetectionResult()
 
         return best_face_result
+
+    def detect_face(self, _in_image):
+        detection_result = self.session.get_faces([_in_image], qualities=True)
+        if len(detection_result.faces) > 0:
+            # Extract left and right eye positions
+            left_eye_x = detection_result.faces[0].landmarks.left_eye.x
+            left_eye_y = detection_result.faces[0].landmarks.left_eye.y
+            right_eye_x = detection_result.faces[0].landmarks.right_eye.x
+            right_eye_y = detection_result.faces[0].landmarks.right_eye.y
+            # find distance between eyes. This will help to determine the distance from user to kiosk
+            face_size = utils.get_distance_between_two_pints(left_eye_x, left_eye_y, right_eye_x, right_eye_y)
+            if face_size > FACE_CONFIG.face_size_threshold:
+                top_left_x = int(detection_result.faces[0].bounding_box.top_left.x)
+                top_left_y = int(detection_result.faces[0].bounding_box.top_left.y)
+                bottom_right_x = int(detection_result.faces[0].bounding_box.bottom_right.x)
+                bottom_right_y = int(detection_result.faces[0].bounding_box.bottom_right.y)
+                print("Face coordinates: ", top_left_x, top_left_y, bottom_right_x, bottom_right_y)
+        return
