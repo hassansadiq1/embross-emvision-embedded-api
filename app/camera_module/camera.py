@@ -1,16 +1,19 @@
 import cv2
 import threading
 from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
-from paravision.liveness import CameraParams
+#from paravision.liveness import CameraParams
 import numpy as np
 import pyrealsense2 as rs
 import time
+from paravision.recognition import Session, Engine
 
 outputFrame = None
 depthFrame = None
 thread_lock = threading.Lock()
 camera_status = None
 camera_params = None
+color = (0, 255, 0)
+thickness = 2
 
 
 class Camera:
@@ -61,6 +64,7 @@ class CameraThread(threading.Thread):
         self.cap.set(cv2.CAP_PROP_BACKLIGHT, self.camera_config.backlight)
 
     def runCam(self):
+        session = Session(engine=Engine.TENSORRT)
         global camera_status
         while True:
             if self.stop:
@@ -80,6 +84,13 @@ class CameraThread(threading.Thread):
                             frame = cv2.rotate(frame, 2)
                         global outputFrame
                         outputFrame = frame.copy()
+                        detection_result = session.get_faces([outputFrame], qualities=True)
+                        if len(detection_result.faces) > 0:
+                            top_left_x = int(detection_result.faces[0].bounding_box.top_left.x)
+                            top_left_y = int(detection_result.faces[0].bounding_box.top_left.y)
+                            bottom_right_x = int(detection_result.faces[0].bounding_box.bottom_right.x)
+                            bottom_right_y = int(detection_result.faces[0].bounding_box.bottom_right.y)
+                            outputFrame = cv2.rectangle(outputFrame, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), color, thickness)
                 else:
                     self.cap.release()
                     camera_status = False
