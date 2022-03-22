@@ -53,4 +53,4 @@ Thumbs.db
 
 # Build files
 build/
-
+app/EMVISION_API/*

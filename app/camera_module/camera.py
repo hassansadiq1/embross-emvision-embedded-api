@@ -1,7 +1,7 @@
 import cv2
 import threading
 from utilities.utils import RawFrame, get_datetime, convert_image_to_base64, CameraSettings
-from paravision.liveness import CameraParams
+from face_detection_module.Paravision.paravision_helper import FaceProcessor
 import numpy as np
 import pyrealsense2 as rs
 import time
@@ -11,6 +11,8 @@ depthFrame = None
 thread_lock = threading.Lock()
 camera_status = None
 camera_params = None
+color = (255, 0, 0)
+thickness = 2
 
 
 class Camera:
@@ -46,6 +48,7 @@ class CameraThread(threading.Thread):
         self.cap = None
         self.stop = False
         self.pipeline = None
+        self.FaceDetection = None
 
     def initialize(self):
         self.cap = cv2.VideoCapture(self.camera_config.id)
@@ -80,6 +83,11 @@ class CameraThread(threading.Thread):
                             frame = cv2.rotate(frame, 2)
                         global outputFrame
                         outputFrame = frame.copy()
+                        if self.FaceDetection.detect_faces(frame):
+                            outputFrame = cv2.rectangle(outputFrame,
+                                                (self.FaceDetection.top_left_x, self.FaceDetection.top_left_y),
+                                                (self.FaceDetection.bottom_right_x, self.FaceDetection.bottom_right_y),
+                                                color, thickness)
                 else:
                     self.cap.release()
                     camera_status = False
@@ -154,6 +162,7 @@ class CameraThread(threading.Thread):
             color_intr = color_profile.get_intrinsics()
             color_to_depth_extr = color_profile.get_extrinsics_to(depth_stream)
             global camera_params
+            from paravision.liveness import CameraParams
             camera_params = CameraParams(depth_intr, color_intr, color_to_depth_extr)
             camera_status = True
         return camera_status
@@ -201,6 +210,7 @@ class CameraThread(threading.Thread):
                 camera_status = False
 
     def run(self):
+        self.FaceDetection = FaceProcessor()
         if self.camera_config.liveness:
             self.initializeRealsense()
             self.runRealsenseCam()

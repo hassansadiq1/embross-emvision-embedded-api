@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from camera_module.camera import Camera
 from videostream.video_server import generate_camera_stream
 import utilities.utils as utils
-from face_detection_module.face_detection import FaceDetection, get_best_shot
+# from face_detection_module.face_detection import FaceDetection, get_best_shot
 from read_config_file import get_port_num, get_host_url, get_authentication_info, get_camera_settings
 import authentication.authenticate as security
 
@@ -13,22 +13,22 @@ Emvision_API = APIRouter()
 
 
 # will return base64 face image.
-@Emvision_API.get(
-    "/camera/face",
-    summary="Capture a cropped face from the camera",
-    description="Capture frames from the camera and return the best cropped face image in a given time.",
-    response_model=utils.FaceDetectionResult,
-    tags=["Camera"]
-)
-async def get_face_image(duration: int,
-                   current_user: utils.User = Depends(security.get_current_active_user)
-                   ):
-    if Camera.get_camera_status():
-        frame = Camera.get_current_frame()
-        if frame is not None:
-            return get_best_shot(duration)
-    else:
-        raise HTTPException(status_code=404, detail="Camera offline")
+# @Emvision_API.get(
+#     "/camera/face",
+#     summary="Capture a cropped face from the camera",
+#     description="Capture frames from the camera and return the best cropped face image in a given time.",
+#     response_model=utils.FaceDetectionResult,
+#     tags=["Camera"]
+# )
+# async def get_face_image(duration: int,
+#                    current_user: utils.User = Depends(security.get_current_active_user)
+#                    ):
+#     if Camera.get_camera_status():
+#         frame = Camera.get_current_frame()
+#         if frame is not None:
+#             return get_best_shot(duration)
+#     else:
+#         raise HTTPException(status_code=404, detail="Camera offline")
 
 
 @Emvision_API.get(
@@ -83,18 +83,18 @@ async def get_camera_list():
     return camera_list
 
 
-@Emvision_API.post(
-    "/compare/images",
-    summary="Compare two face images",
-    response_model=utils.ImageComparision,
-    tags=["1:1 Compare"]
-)
-async def compare_images(
-    img1_base64: str = Form(...),
-    img2_base64: str = Form(...),
-    current_user: utils.User = Depends(security.get_current_active_user)
-):
-    return FaceDetection.compare_faces(img1_base64, img2_base64)
+# @Emvision_API.post(
+#     "/compare/images",
+#     summary="Compare two face images",
+#     response_model=utils.ImageComparision,
+#     tags=["1:1 Compare"]
+# )
+# async def compare_images(
+#     img1_base64: str = Form(...),
+#     img2_base64: str = Form(...),
+#     current_user: utils.User = Depends(security.get_current_active_user)
+# ):
+#     return FaceDetection.compare_faces(img1_base64, img2_base64)
 
 
 @Emvision_API.get(
