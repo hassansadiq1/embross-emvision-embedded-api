@@ -8,6 +8,7 @@ import time
 
 outputFrame = None
 depthFrame = None
+perform_detection = False
 thread_lock = threading.Lock()
 camera_status = None
 camera_params = None
@@ -19,6 +20,11 @@ class Camera:
     @staticmethod
     def get_current_frame():
         return outputFrame
+
+    @staticmethod
+    def set_perform_detection():
+        global perform_detection
+        perform_detection = True
 
     @staticmethod
     def get_base64_image():
@@ -49,8 +55,10 @@ class CameraThread(threading.Thread):
         self.stop = False
         self.pipeline = None
         self.FaceDetection = None
+        # self.FaceDetection = FaceProcessor()
 
     def initialize(self):
+        # self.cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
         self.cap = cv2.VideoCapture(self.camera_config.id)
         self.cap.set(cv2.CAP_PROP_FPS, self.camera_config.frames_per_sec)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.camera_config.frame_width)
@@ -65,6 +73,7 @@ class CameraThread(threading.Thread):
 
     def runCam(self):
         global camera_status
+        global perform_detection
         while True:
             if self.stop:
                 self.cap.release()
@@ -83,11 +92,19 @@ class CameraThread(threading.Thread):
                             frame = cv2.rotate(frame, 2)
                         global outputFrame
                         outputFrame = frame.copy()
-                        if self.FaceDetection.detect_faces(frame):
-                            outputFrame = cv2.rectangle(outputFrame,
-                                                (self.FaceDetection.top_left_x, self.FaceDetection.top_left_y),
-                                                (self.FaceDetection.bottom_right_x, self.FaceDetection.bottom_right_y),
-                                                color, thickness)
+                        if perform_detection:
+                            face_result = self.FaceDetection.detect_faces(frame)
+                            print(face_result)
+                            # use face result to move actuator
+                            if face_result.faces > 0:
+                                outputFrame = cv2.rectangle(outputFrame,
+                                                            (self.FaceDetection.top_left_x, self.FaceDetection.top_left_y),
+                                                            (self.FaceDetection.bottom_right_x,
+                                                             self.FaceDetection.bottom_right_y),
+                                                            color, thickness)
+                                if self.FaceDetection.verify_face_position():
+                                    # stop actuator and perform liveness here
+                                    perform_detection = False
                 else:
                     self.cap.release()
                     camera_status = False

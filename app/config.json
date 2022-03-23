@@ -8,7 +8,7 @@
         "LIVENESS_THRESHOLD": 0.5
     },
   "camera": {
-      "index": "/dev/video0",
+      "index": "/dev/video1",
       "name": "rgb",
       "frame_rate": 30,
       "height": 720,

@@ -30,6 +30,21 @@ Emvision_API = APIRouter()
 #     else:
 #         raise HTTPException(status_code=404, detail="Camera offline")
 
+# will run face detection
+@Emvision_API.get(
+    "/camera/detectFace",
+    summary="start detecting face from the camera",
+    description="detect faces from the camera and draw on video.",
+    response_model=utils.FaceDetectionResult,
+    tags=["Camera"]
+)
+async def start_face_detection():
+    if Camera.get_camera_status():
+        Camera.set_perform_detection()
+        return
+    else:
+        raise HTTPException(status_code=404, detail="Camera offline")
+
 
 @Emvision_API.get(
     "/camera/image",

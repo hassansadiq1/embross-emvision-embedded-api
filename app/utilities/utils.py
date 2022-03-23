@@ -62,6 +62,12 @@ class FaceDetectionResult(BaseModel):
     box_y: int = 0
     box_height: int = 0
     box_width: int = 0
+    top_left_x: int = 0
+    top_left_y: int = 0
+    bottom_right_x: int = 0
+    bottom_right_y: int = 0
+    frame_height: int = 0
+    frame_width: int = 0
     time: datetime = None
 
 
