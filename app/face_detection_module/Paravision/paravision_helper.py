@@ -7,7 +7,7 @@ class FaceProcessor:
     def __init__(self):
         from paravision.recognition import Session, Engine
         from paravision.liveness.session import Liveness
-        self.face_config = get_face_settings()
+        self.FACE_CONFIG = get_face_settings()
         self.session = Session(engine=Engine.TENSORRT)
         self.camera_config = get_camera_settings()
         self.session.get_faces([np.random.rand(self.camera_config.frame_width, self.camera_config.frame_height, 3)],
@@ -19,6 +19,7 @@ class FaceProcessor:
         self.face_position_counter = 0
 
         # detection results
+        self.num_faces = 0
         self.detection_result = None
         self.face_result = utils.FaceDetectionResult()
         self.top_left_x = 0
@@ -26,9 +27,13 @@ class FaceProcessor:
         self.bottom_right_x = 0
         self.bottom_right_y = 0
 
+        # liveness
+        self.window = []
+
     def detect_faces(self, _in_image):
         self.face_result = utils.FaceDetectionResult()
         self.detection_result = self.session.get_faces([_in_image], qualities=True)
+        self.num_faces = len(self.detection_result.faces)
         if len(self.detection_result.faces) > 0:
             # Extract left and right eye positions
             left_eye_x = self.detection_result.faces[0].landmarks.left_eye.x
@@ -67,15 +72,27 @@ class FaceProcessor:
         right_eye_y = self.detection_result.faces[0].landmarks.right_eye.y
         # find distance between eyes. This will help to determine the distance from user to kiosk
         face_size = utils.get_distance_between_two_pints(left_eye_x, left_eye_y, right_eye_x, right_eye_y)
-        if face_size > self.face_config.face_size_threshold:
+        if face_size > self.FACE_CONFIG.face_size_threshold:
             return True
         else:
             return False
 
     def verify_face_position(self):
-        self.face_position_counter += 1
-        if self.face_position_counter > 30:
-            self.face_position_counter = 0
+        if self.num_faces:
+            self.face_position_counter += 1
+            if self.face_position_counter > 30:
+                return True
+        return False
+
+    def get_liveness(self, camera_params, depth_frame):
+        bounding_box = self.detection_result.faces[0].bounding_box
+        cropped_depth_frame = self.liveness.crop_depth_frame(camera_params, depth_frame, bounding_box)
+        self.window.append(cropped_depth_frame)
+        if len(self.window) == 5:
+            liveness_probability = self.liveness.compute_liveness_probability(self.window)
+            if liveness_probability > self.FACE_CONFIG.liveness_threshold:
+                self.face_result.liveness = liveness_probability
+            else:
+                self.face_result = utils.FaceDetectionResult()
             return True
-        else:
-            return False
+        return False

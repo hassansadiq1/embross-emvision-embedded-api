@@ -83,28 +83,32 @@ class CameraThread(threading.Thread):
                 read_status, frame = self.cap.read()
                 if read_status:
                     camera_status = True
+                    if self.camera_config.rotation == 90:
+                        frame = cv2.rotate(frame, 0)
+                    elif self.camera_config.rotation == 180:
+                        frame = cv2.rotate(frame, 1)
+                    elif self.camera_config.rotation == 270:
+                        frame = cv2.rotate(frame, 2)
+
+                    if perform_detection:
+                        face_result = self.FaceDetection.detect_faces(frame)
+                        print(face_result)
+                        # use face result to move actuator
+
+                        if self.FaceDetection.verify_face_position():
+                            print("stop actuator and perform next steps")
+                            self.FaceDetection.num_faces = 0
+                            perform_detection = False
+
                     with thread_lock:
-                        if self.camera_config.rotation == 90:
-                            frame = cv2.rotate(frame, 0)
-                        elif self.camera_config.rotation == 180:
-                            frame = cv2.rotate(frame, 1)
-                        elif self.camera_config.rotation == 270:
-                            frame = cv2.rotate(frame, 2)
                         global outputFrame
                         outputFrame = frame.copy()
-                        if perform_detection:
-                            face_result = self.FaceDetection.detect_faces(frame)
-                            print(face_result)
-                            # use face result to move actuator
-                            if face_result.faces > 0:
-                                outputFrame = cv2.rectangle(outputFrame,
-                                                            (self.FaceDetection.top_left_x, self.FaceDetection.top_left_y),
-                                                            (self.FaceDetection.bottom_right_x,
-                                                             self.FaceDetection.bottom_right_y),
-                                                            color, thickness)
-                                if self.FaceDetection.verify_face_position():
-                                    # stop actuator and perform liveness here
-                                    perform_detection = False
+                        if self.FaceDetection.num_faces:
+                            outputFrame = cv2.rectangle(outputFrame,
+                                                        (self.FaceDetection.top_left_x, self.FaceDetection.top_left_y),
+                                                        (self.FaceDetection.bottom_right_x,
+                                                         self.FaceDetection.bottom_right_y),
+                                                        color, thickness)
                 else:
                     self.cap.release()
                     camera_status = False
@@ -187,6 +191,7 @@ class CameraThread(threading.Thread):
     def runRealsenseCam(self):
         global camera_status
         global outputFrame, depthFrame
+        global perform_detection
 
         while True:
             if self.stop:
@@ -216,9 +221,32 @@ class CameraThread(threading.Thread):
                         color_image = cv2.rotate(color_image, 2)
                         depth_image = cv2.rotate(depth_image, 2)
 
+                    if perform_detection:
+                        face_result = self.FaceDetection.detect_faces(color_image)
+                        print(face_result)
+                        # use face result to move actuator
+
+                        if self.FaceDetection.verify_face_position():
+                            # stop actuator and perform liveness
+                            if self.FaceDetection.get_liveness(camera_params, depth_image):
+                                self.FaceDetection.face_position_counter = 0
+                                self.FaceDetection.num_faces = 0
+                                if self.FaceDetection.face_result.liveness > 0:
+                                    print("liveness passed, take 4k picture here")
+                                perform_detection = False
+                        else:
+                            # move actuator until face position is fixed
+                            pass
+
                     with thread_lock:
+                        if self.FaceDetection.num_faces:
+                            outputFrame = cv2.rectangle(outputFrame,
+                                                        (self.FaceDetection.top_left_x, self.FaceDetection.top_left_y),
+                                                        (self.FaceDetection.bottom_right_x,
+                                                         self.FaceDetection.bottom_right_y),
+                                                        color, thickness)
                         outputFrame = color_image.copy()
-                        depthFrame = depth_image.copy()
+
                 else:
                     time.sleep(0.2)
                     self.initializeRealsense()
