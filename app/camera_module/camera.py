@@ -227,9 +227,12 @@ class CameraThread(threading.Thread):
                         # use face result to move actuator
 
                         if self.FaceDetection.verify_face_position():
+                            print("accumulating frames for liveness")
                             # stop actuator and perform liveness
                             self.FaceDetection.get_liveness(camera_params, depth_image)
-                            if len(self.FaceDetection.window) > 4:
+                            if self.FaceDetection.livenessFlag:
+                                self.FaceDetection.window.clear()
+                                self.FaceDetection.livenessFlag = False
                                 if self.FaceDetection.face_result.liveness > 0:
                                     print("liveness passed, take 4k picture here")
                                 else:
