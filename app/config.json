@@ -20,7 +20,7 @@
       "sharpness": 2,
       "gamma": 100,
       "backlight": 1,
-     "rotation_cw": 90,
+     "rotation_cw": 0,
       "liveness": 1
     },
   "server": {
@@ -40,5 +40,16 @@
    "logging": {
     "level": "INFO",
      "logs_stored_for_days": 7
+  },
+  "actuator": {
+  "filter_size" : 5,
+  "top_limit" : 0,
+  "bottom_limit": 30000,
+  "home": 17000,
+  "steps_interval": 220,
+  "ki_up": 0.05,
+  "ki_down": 0.02,
+  "frames_to_wait":10,
+  "rest_time_in_sec": 1
   }
 }

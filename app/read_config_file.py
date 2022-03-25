@@ -1,5 +1,5 @@
 import json
-from utilities.utils import CameraSettings, LogConfig, CroppedFaceSettings
+from utilities.utils import CameraSettings, LogConfig, CroppedFaceSettings, ActuatorSettings
 
 
 raw_json_data: dict
@@ -75,3 +75,20 @@ def get_log_config():
     log_configuration.level = raw_json_data["logging"].get("level")
     log_configuration.backup_in_days = raw_json_data["logging"].get("logs_stored_for_days")
     return log_configuration
+
+
+def get_actuator_settings():
+    actuator_config = ActuatorSettings()
+    if raw_json_data is not None:
+        actuator_config.filter_size = raw_json_data["actuator"].get("filter_size")
+        actuator_config.top_limit = raw_json_data["actuator"].get("top_limit")
+        actuator_config.bottom_limit = raw_json_data["actuator"].get("bottom_limit")
+        actuator_config.home = raw_json_data["actuator"].get("home")
+        actuator_config.steps_interval = raw_json_data["actuator"].get("steps_interval")
+        actuator_config.ki_up = raw_json_data["actuator"].get("ki_up")
+        actuator_config.ki_down = raw_json_data["actuator"].get("ki_down")
+        actuator_config.frames_to_wait = raw_json_data["actuator"].get("frames_to_wait")
+        actuator_config.rest_time_in_sec = raw_json_data["actuator"].get("rest_time_in_sec")
+    else:
+        raise Exception("config.jason file is None")
+    return actuator_config

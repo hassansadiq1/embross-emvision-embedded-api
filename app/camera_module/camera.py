@@ -5,6 +5,7 @@ from face_detection_module.Paravision.paravision_helper import FaceProcessor
 import numpy as np
 import pyrealsense2 as rs
 import time
+from actuator.actuator import Actuator
 
 outputFrame = None
 depthFrame = None
@@ -56,6 +57,7 @@ class CameraThread(threading.Thread):
         self.pipeline = None
         self.FaceDetection = None
         # self.FaceDetection = FaceProcessor()
+        self.actuator = Actuator()
 
     def initialize(self):
         # self.cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
@@ -194,6 +196,7 @@ class CameraThread(threading.Thread):
         global perform_detection
 
         while True:
+            self.actuator.exercise_actuator()
             if self.stop:
                 self.pipeline.stop()
                 return
@@ -223,6 +226,7 @@ class CameraThread(threading.Thread):
 
                     if perform_detection:
                         face_result = self.FaceDetection.detect_faces(color_image)
+                        # self.actuator.move_actuator_to(face_result)
                         print(face_result)
                         # use face result to move actuator
 

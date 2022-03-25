@@ -137,6 +137,17 @@ class LogConfig:
     backup_in_days: int
 
 
+class ActuatorSettings(BaseModel):
+    filter_size: int = 0
+    top_limit: int = 0
+    bottom_limit: int = 0
+    home: int = 0
+    steps_interval: int = 0
+    ki_up: float = 0
+    ki_down: float = 0
+    frames_to_wait = 0
+    rest_time_in_sec = 0.0
+
 # converts image to base64 string format
 def convert_image_to_base64(_image):
     return_value, out_frame = cv2.imencode('.jpg', _image)
