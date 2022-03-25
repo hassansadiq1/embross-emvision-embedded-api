@@ -80,7 +80,7 @@ class FaceProcessor:
     def verify_face_position(self):
         if self.num_faces:
             self.face_position_counter += 1
-            if self.face_position_counter > 30:
+            if self.face_position_counter > 20:
                 return True
         return False
 
@@ -94,5 +94,3 @@ class FaceProcessor:
                 self.face_result.liveness = liveness_probability
             else:
                 self.face_result = utils.FaceDetectionResult()
-            return True
-        return False

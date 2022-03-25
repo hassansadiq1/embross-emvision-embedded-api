@@ -20,8 +20,8 @@
       "sharpness": 2,
       "gamma": 100,
       "backlight": 1,
-     "rotation_cw": 0,
-      "liveness": 0
+     "rotation_cw": 90,
+      "liveness": 1
     },
   "server": {
       "host_url": "0.0.0.0",
