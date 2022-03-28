@@ -6,10 +6,11 @@ import numpy as np
 import pyrealsense2 as rs
 import time
 from actuator.actuator import Actuator
+from camera_module.econCamera import EconCamera, clear_frame
 
 outputFrame = None
 depthFrame = None
-perform_detection = False
+perform_detection = True
 thread_lock = threading.Lock()
 camera_status = None
 camera_params = None
@@ -49,7 +50,7 @@ class Camera:
 
 # This thread captures image continuously
 class CameraThread(threading.Thread):
-    def __init__(self, camera_config: CameraSettings):
+    def __init__(self, camera_config: CameraSettings, econ_config: CameraSettings):
         threading.Thread.__init__(self)
         self.camera_config = camera_config
         self.cap = None
@@ -58,6 +59,7 @@ class CameraThread(threading.Thread):
         self.FaceDetection = None
         # self.FaceDetection = FaceProcessor()
         self.actuator = Actuator()
+        self.econ_cam = EconCamera(econ_config)
 
     def initialize(self):
         # self.cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
@@ -224,14 +226,13 @@ class CameraThread(threading.Thread):
                         color_image = cv2.rotate(color_image, 2)
                         depth_image = cv2.rotate(depth_image, 2)
 
-                    if perform_detection:
+                    if True: # perform_detection:
                         face_result = self.FaceDetection.detect_faces(color_image)
-                        # self.actuator.move_actuator_to(face_result)
-                        # print(face_result)
+                        flag = self.actuator.handle_actuator(face_result)
                         # use face result to move actuator
 
-                        if self.FaceDetection.verify_face_position():
-                            # print("accumulating frames for liveness")
+                        if flag:
+                            print("accumulating frames for liveness")
                             # stop actuator and perform liveness
                             self.FaceDetection.get_liveness(camera_params, depth_image)
                             if self.FaceDetection.livenessFlag:
@@ -242,11 +243,11 @@ class CameraThread(threading.Thread):
                                 self.FaceDetection.livenessFlag = False
                                 if self.FaceDetection.face_result.liveness > 0:
                                     print("liveness passed, take 4k picture here")
+                                    self.econ_cam.capture_image()
                                 else:
                                     print("liveness test failed")
                         else:
-                            # move actuator until face position is fixed
-                            pass
+                            clear_frame()
 
                     with thread_lock:
                         if self.FaceDetection.num_faces:

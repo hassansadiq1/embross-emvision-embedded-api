@@ -91,7 +91,7 @@ class FaceProcessor:
         self.window.append(cropped_depth_frame)
         if len(self.window) == 5:
             liveness_probability = self.liveness.compute_liveness_probability(self.window)
-            self.liveness = True
+            self.livenessFlag = True
             print("liveness probability: ", liveness_probability)
             if liveness_probability > self.FACE_CONFIG.liveness_threshold:
                 self.face_result.liveness = liveness_probability

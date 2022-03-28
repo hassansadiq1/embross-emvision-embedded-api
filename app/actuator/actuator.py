@@ -56,7 +56,8 @@ class Actuator:
         self.motor_position = self.home
         self.counter = 0
         self.home_counter = 0
-        status = yaml.safe_load(self.actuator_command('-s', '--full'))
+        # status = yaml.safe_load(self.actuator_command('-s', '--full'))
+        self.position = self.home
         # self.position = status['Current position']
         # self.first_time = True
         self.new_target = self.config.top_limit
@@ -69,34 +70,34 @@ class Actuator:
         if self.bottom_limit > position > self.top_limit:
             self.actuator_command('--exit-safe-start', '--position', str(position))
 
-    # def handle_actuator(self, face_result):
-    #     res = False
-    #     if face_result.faces > 0:
-    #         face_center_y = face_result.box_y + face_result.box_width
-    #         self.y_filter.append(face_center_y)
-    #         diff = int((self.y_filter.average() / face_result.frame_height) * 100)
-    #         if diff > 55:
-    #             self.counter = 0
-    #             if self.motor_position > self.top_limit:
-    #                 self.motor_position = self.motor_position + int(self.steps * abs(diff) * self.ki_down)
-    #         elif diff < 45:
-    #             self.counter = 0
-    #             if self.motor_position < self.bottom_limit:
-    #                 self.motor_position = self.motor_position - int(self.steps * abs(diff) * self.ki_up)
-    #         else:
-    #             self.counter += 1
-    #             if self.counter > 5:
-    #                 res = True
-    #         self.move_actuator_to(int(self.motor_position))
-    #     else:
-    #         self.home_counter += 1
-    #         res = False
-    #         self.y_filter.reset()
-    #         self.motor_position = self.home
-    #         if self.home_counter > self.config.frames_to_wait:
-    #             self.move_actuator_to(self.motor_position)
-    #             self.home_counter = 0
-    #     return res
+    def handle_actuator(self, face_result):
+        res = False
+        if face_result.faces > 0:
+            face_center_y = face_result.box_y + face_result.box_width
+            self.y_filter.append(face_center_y)
+            diff = int((self.y_filter.average() / face_result.frame_height) * 100)
+            if diff > 55:
+                self.counter = 0
+                if self.motor_position > self.top_limit:
+                    self.motor_position = self.motor_position + int(self.steps * abs(diff) * self.ki_down)
+            elif diff < 45:
+                self.counter = 0
+                if self.motor_position < self.bottom_limit:
+                    self.motor_position = self.motor_position - int(self.steps * abs(diff) * self.ki_up)
+            else:
+                self.counter += 1
+                if self.counter > 5:
+                    res = True
+            self.move_actuator_to(int(self.motor_position))
+        else:
+            self.home_counter += 1
+            res = False
+            self.y_filter.reset()
+            self.motor_position = self.home
+            if self.home_counter > self.config.frames_to_wait:
+                self.move_actuator_to(self.motor_position)
+                self.home_counter = 0
+        return res
 
     def exercise_actuator(self):
         if self.position == self.bottom_limit:

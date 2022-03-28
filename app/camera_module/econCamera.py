@@ -1,5 +1,5 @@
 import cv2
-from app.utilities.utils import RawFrame, convert_image_to_base64, get_datetime, CameraSettings
+from utilities.utils import RawFrame, convert_image_to_base64, get_datetime, CameraSettings
 
 
 output_image = None
@@ -44,6 +44,7 @@ class EconCamera:
                 res = True
                 global output_image
                 output_image = frame.copy()
+                cv2.imwrite("test.jpg", output_image)
             else:
                 output_image = None
                 self.cap.release()

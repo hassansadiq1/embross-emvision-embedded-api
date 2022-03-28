@@ -59,7 +59,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     setup_logs()
     # create threads
-    camera_thread1 = CameraThread(camera_config=get_camera_settings())
+    camera_thread1 = CameraThread(camera_config=get_camera_settings(), econ_config=get_econ_camera_settings())
     camera_thread1.daemon = True
     camera_thread1.start()
     start_uvicorn_server()  # run as thread later

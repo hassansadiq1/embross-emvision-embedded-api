@@ -38,6 +38,20 @@ def get_camera_settings():
     return camera_config
 
 
+def get_econ_camera_settings():
+    econ_config = CameraSettings()
+    if raw_json_data is not None:
+        econ_config.id = raw_json_data["E-Con"].get("index")
+        econ_config.name = raw_json_data["E-Con"].get("name")
+        econ_config.frame_width = raw_json_data["E-Con"].get("width")
+        econ_config.frame_height = raw_json_data["E-Con"].get("height")
+        econ_config.frames_per_sec = raw_json_data["E-Con"].get("frame_rate")
+        econ_config.rotation = raw_json_data["E-Con"].get("rotation_cw")
+    else:
+        raise Exception("config.jason file is None")
+    return econ_config
+
+
 def get_host_url():
     return raw_json_data["server"].get("host_url")
 
