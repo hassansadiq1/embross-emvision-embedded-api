@@ -101,3 +101,52 @@ class FaceProcessor:
     def get_embeddings(self, image):
         image_result = self.session.get_faces([image], embeddings=True)
         return image_result
+
+    def get_faces(self, _in_image):
+        best_face_result = utils.FaceDetectionResult()
+        detection_result = self.session.get_faces([_in_image], qualities=True)
+        if len(detection_result.faces) > 0:
+            # Extract left and right eye positions
+            left_eye_x = detection_result.faces[0].landmarks.left_eye.x
+            left_eye_y = detection_result.faces[0].landmarks.left_eye.y
+            right_eye_x = detection_result.faces[0].landmarks.right_eye.x
+            right_eye_y = detection_result.faces[0].landmarks.right_eye.y
+            # find distance between eyes. This will help to determine the distance from user to kiosk
+            face_size = utils.get_distance_between_two_pints(left_eye_x, left_eye_y, right_eye_x, right_eye_y)
+            if face_size > self.FACE_CONFIG.face_size_threshold:
+                top_left_x = int(detection_result.faces[0].bounding_box.top_left.x)
+                top_left_y = int(detection_result.faces[0].bounding_box.top_left.y)
+                bottom_right_x = int(detection_result.faces[0].bounding_box.bottom_right.x)
+                bottom_right_y = int(detection_result.faces[0].bounding_box.bottom_right.y)
+
+                # add padding
+                top_left_y = top_left_y - self.FACE_CONFIG.height_padding
+                bottom_right_y = bottom_right_y + self.FACE_CONFIG.height_padding
+                top_left_x = top_left_x - self.FACE_CONFIG.width_padding
+                if top_left_x < 0:
+                    top_left_x = 0
+                bottom_right_x = bottom_right_x + self.FACE_CONFIG.width_padding
+
+                cropped_face = utils.crop_face(top_left_x, top_left_y,
+                                               bottom_right_x, bottom_right_y,
+                                               _in_image)
+                best_face_result.faces = len(detection_result.faces)
+                best_face_result.faces = len(detection_result.faces)
+                best_face_result.quality = detection_result.faces[0].quality
+                best_face_result.acceptability = detection_result.faces[0].acceptability
+                best_face_result.liveness = 1
+                best_face_result.face_size = face_size
+                best_face_result.box_height = detection_result.faces[0].bounding_box.height()
+                best_face_result.box_width = detection_result.faces[0].bounding_box.width()
+                best_face_result.box_x = int(detection_result.faces[0].bounding_box.top_left.x)
+                best_face_result.box_y = int(detection_result.faces[0].bounding_box.top_left.y)
+                best_face_result.base64 = utils.convert_image_to_base64(cropped_face)
+                best_face_result.top_left_x = int(detection_result.faces[0].bounding_box.top_left.x)
+                best_face_result.top_left_y = int(detection_result.faces[0].bounding_box.top_left.y)
+                best_face_result.bottom_right_x = int(detection_result.faces[0].bounding_box.bottom_right.x)
+                best_face_result.bottom_right_y = int(detection_result.faces[0].bounding_box.bottom_right.y)
+                best_face_result.frame_height = _in_image.shape[0]
+                best_face_result.frame_width = _in_image.shape[1]
+
+        best_face_result.time = utils.get_datetime()
+        return best_face_result

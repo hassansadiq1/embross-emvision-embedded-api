@@ -40,6 +40,7 @@ def gstreamer_pipeline(
 class EconCamera:
     def __init__(self, _config: CameraSettings):
         self._config = _config
+        self._frame = None
         pipeline = gstreamer_pipeline(device=self._config.id,
                                       frame_rate=self._config.frames_per_sec,
                                       capture_width=self._config.frame_width,
@@ -52,18 +53,18 @@ class EconCamera:
     def capture_image(self):
         res = False
         if self.cap.isOpened():
-            read_status, frame = self.cap.read()
+            read_status, self._frame = self.cap.read()
             if read_status:
                 if self._config.rotation == 90:
-                    frame = cv2.rotate(frame, 0)
+                    self._frame = cv2.rotate(self._frame, 0)
                 elif self._config.rotation == 180:
-                    frame = cv2.rotate(frame, 1)
+                    self._frame = cv2.rotate(self._frame, 1)
                 elif self._config.rotation == 270:
-                    frame = cv2.rotate(frame, 2)
+                    self._frame = cv2.rotate(self._frame, 2)
                 res = True
                 global output_image
-                output_image = frame.copy()
-                cv2.imwrite("test.jpg", output_image)
+                output_image = self._frame.copy()
+                # cv2.imwrite("test.jpg", output_image)
             else:
                 output_image = None
                 self.cap.release()

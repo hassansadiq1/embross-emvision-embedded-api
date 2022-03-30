@@ -7,6 +7,7 @@ import pyrealsense2 as rs
 import time
 from actuator.actuator import Actuator
 from camera_module.econCamera import EconCamera, clear_frame
+import utilities.utils as utils
 
 outputFrame = None
 depthFrame = None
@@ -16,6 +17,7 @@ camera_status = None
 camera_params = None
 color = (255, 0, 0)
 thickness = 2
+face_detection = utils.FaceDetectionResult()
 
 
 class Camera:
@@ -46,6 +48,10 @@ class Camera:
     @staticmethod
     def get_camera_params():
         return camera_params
+
+    @staticmethod
+    def get_face_detection():
+        return face_detection
 
 
 # This thread captures image continuously
@@ -244,11 +250,14 @@ class CameraThread(threading.Thread):
                                 if self.FaceDetection.face_result.liveness > 0:
                                     print("liveness passed, take 4k picture here")
                                     self.econ_cam.capture_image()
-
+                                    global face_detection
+                                    face_detection = self.FaceDetection.get_faces(self.econ_cam._frame)
                                 else:
                                     print("liveness test failed")
                         else:
                             clear_frame()
+                            global face_detection
+                            face_detection = utils.FaceDetectionResult()
 
                     with thread_lock:
                         if self.FaceDetection.num_faces:

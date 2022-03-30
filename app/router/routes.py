@@ -58,6 +58,16 @@ def get_camera_image(current_user: utils.User = Depends(security.get_current_act
 
 
 @Emvision_API.get(
+    "/camera/face",
+    summary="perform face detection on Econ camera",
+    response_model=utils.FaceDetectionResult,
+    tags=["Camera"]
+)
+def get_camera_image(current_user: utils.User = Depends(security.get_current_active_user)):
+    return Camera.get_face_detection()
+
+
+@Emvision_API.get(
     "/camera/stream",
     summary="Get live steam URL of Camera",
     response_model=utils.VideoStream,
