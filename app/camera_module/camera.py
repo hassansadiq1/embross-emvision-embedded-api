@@ -237,6 +237,7 @@ class CameraThread(threading.Thread):
                         flag = self.actuator.handle_actuator(face_result)
                         # use face result to move actuator
 
+                        global face_detection
                         if flag:
                             print("accumulating frames for liveness")
                             # stop actuator and perform liveness
@@ -250,13 +251,11 @@ class CameraThread(threading.Thread):
                                 if self.FaceDetection.face_result.liveness > 0:
                                     print("liveness passed, take 4k picture here")
                                     self.econ_cam.capture_image()
-                                    global face_detection
                                     face_detection = self.FaceDetection.get_faces(self.econ_cam._frame)
                                 else:
                                     print("liveness test failed")
                         else:
                             clear_frame()
-                            global face_detection
                             face_detection = utils.FaceDetectionResult()
 
                     with thread_lock:
