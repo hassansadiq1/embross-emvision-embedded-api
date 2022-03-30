@@ -198,7 +198,7 @@ class CameraThread(threading.Thread):
         global perform_detection
 
         while True:
-            self.actuator.exercise_actuator()
+            # self.actuator.exercise_actuator()
             if self.stop:
                 self.pipeline.stop()
                 return
@@ -244,6 +244,7 @@ class CameraThread(threading.Thread):
                                 if self.FaceDetection.face_result.liveness > 0:
                                     print("liveness passed, take 4k picture here")
                                     self.econ_cam.capture_image()
+
                                 else:
                                     print("liveness test failed")
                         else:

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Form, HTTPException, Depends, status
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from camera_module.camera import Camera
+from camera_module.econCamera import *
 from videostream.video_server import generate_camera_stream
 import utilities.utils as utils
 # from face_detection_module.face_detection import FaceDetection, get_best_shot
@@ -53,10 +54,7 @@ async def start_face_detection():
     tags=["Camera"]
 )
 def get_camera_image(current_user: utils.User = Depends(security.get_current_active_user)):
-    if Camera.get_camera_status():
-        return Camera.get_base64_image()
-    else:
-        raise HTTPException(status_code=404, detail="Camera offline")
+    return get_econ_base64()
 
 
 @Emvision_API.get(
