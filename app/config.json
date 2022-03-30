@@ -24,9 +24,9 @@
       "liveness": 1
     },
   "E-Con": {
-    "index": 2,
+    "index": "/dev/video3",
     "name": "econ",
-    "frame_rate": 15,
+    "frame_rate": 9,
     "height": 3120,
     "width": 4208,
     "rotation_cw": 90

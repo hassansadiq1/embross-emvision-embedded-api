@@ -97,3 +97,7 @@ class FaceProcessor:
                 self.face_result.liveness = liveness_probability
             else:
                 self.face_result = utils.FaceDetectionResult()
+
+    def get_embeddings(self, image):
+        image_result = self.session.get_faces([image], embeddings=True)
+        return image_result

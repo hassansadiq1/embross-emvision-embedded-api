@@ -11,7 +11,8 @@ def get_econ_image():
 
 def clear_frame():
     global output_image
-    output_image = None
+    if output_image is not None:
+        output_image = None
 
 
 def get_econ_base64():
@@ -22,13 +23,31 @@ def get_econ_base64():
     return raw_frame
 
 
+def gstreamer_pipeline(
+        device="/dev/video3", frame_rate=15,
+        capture_width=3840, capture_height=2160):
+    return (
+            "v4l2src device=%s num-buffers=450 ! "
+            "video/x-raw, "
+            "width=(int)%d, height=(int)%d, "
+            "framerate=(fraction)%d/1 ! "
+            "videoconvert ! appsink"
+            % (device, capture_width,
+               capture_height, frame_rate)
+    )
+
+
 class EconCamera:
     def __init__(self, _config: CameraSettings):
         self._config = _config
-        self.cap = cv2.VideoCapture(self._config.id, cv2.CAP_DSHOW)
-        self.cap.set(cv2.CAP_PROP_FPS, self._config.frames_per_sec)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._config.frame_width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self._config.frame_height)
+        pipeline = gstreamer_pipeline(device=self._config.id,
+                                      frame_rate=self._config.frames_per_sec,
+                                      capture_width=self._config.frame_width,
+                                      capture_height=self._config.frame_height)
+        self.cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+        # self.cap.set(cv2.CAP_PROP_FPS, self._config.frames_per_sec)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._config.frame_width)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self._config.frame_height)
 
     def capture_image(self):
         res = False
@@ -51,23 +70,13 @@ class EconCamera:
         else:
             res = False
             output_image = None
-            self.cap = cv2.VideoCapture(self._config.id, cv2.CAP_DSHOW)
-            self.cap.set(cv2.CAP_PROP_FPS, self._config.frames_per_sec)
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._config.frame_width)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self._config.frame_height)
+            pipeline = gstreamer_pipeline(device=self._config.id,
+                                          frame_rate=self._config.frames_per_sec,
+                                          capture_width=self._config.frame_width,
+                                          capture_height=self._config.frame_height)
+            self.cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+            # self.cap.set(cv2.CAP_PROP_FPS, self._config.frames_per_sec)
+            # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._config.frame_width)
+            # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self._config.frame_height)
 
         return res
-
-
-
-
-
-
-
-
-
-
-
-
-
-
