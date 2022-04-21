@@ -63,6 +63,7 @@ class FaceDetectionResult(BaseModel):
     box_height: int = 0
     box_width: int = 0
     time: datetime = None
+    mask_detected = ""
 
 
 class ImageComparision(BaseModel):
