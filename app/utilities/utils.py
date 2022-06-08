@@ -17,17 +17,21 @@ class CameraSettings(BaseModel):
     frames_per_sec: float = 30.0
     frame_width: int = 1280
     frame_height: int = 720
-    brightness: int = 0
-    contrast: int = 36
-    hue: int = 0
-    saturation: int = 72
-    sharpness: int = 2
-    gamma: int = 100
-    backlight: int = 1
     rotation: int = 0
     online: bool = False
     enabled: bool = True
-    liveness: int = 0
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": "0                        # camera index",
+                "name": "rgb                    # name of the camera",
+                "frames_per_sec": "30           # frames per second camera is set to",
+                "rotation": "0                  # image rotation in clockwise in degrees (0,90,180,360)",
+                "online": "True / False         # True: camera online , False: Camera is offline",
+                "enabled": "True / False        # this is not used always true",
+            }
+        }
 
 
 class AppConfig:
@@ -63,6 +67,23 @@ class FaceDetectionResult(BaseModel):
     box_height: int = 0
     box_width: int = 0
     time: datetime = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "quality": "0.8321                  # range (0 to 1)",
+                "acceptability": "0.9999            # range (0 to 1)",
+                "face_size": "100                   # number of pixels between eyes.",
+                "liveness": "0.9999,                # -1 indicates liveness not supported range(0 to 1)",
+                "faces": "0                         # Number of faces detected in the frame)",
+                "box_x": "614                       # box_x pixel position",
+                "box_y": "298                       # box_y pixel position",
+                "box_height": "391                 # height of face in pixels",
+                "box_width": "331                  # width of face in pixels",
+                "time": "YYYY-MM-21THH:MM:SS.MS",
+                "base64": " base64 string           # Cropped face image in base64 format",
+            }
+        }
 
 
 class ImageComparision(BaseModel):
@@ -149,6 +170,8 @@ def convert_base64_to_image(base64_string):
 def crop_face(top_left_x, top_left_y, bottom_right_x, bottom_right_y,  _input_frame):
     # crops image           [start_row:end_row, start_column:end_column]
     crop_img = _input_frame[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
+    if crop_img.size <= 0:
+        crop_img = None
     return crop_img
 
 

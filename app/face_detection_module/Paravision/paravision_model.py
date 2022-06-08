@@ -43,17 +43,18 @@ class ParavisionFaceDetection(object):
                 cropped_face = utils.crop_face(top_left_x, top_left_y,
                                                bottom_right_x, bottom_right_y,
                                                _in_image)
-                best_face_result.faces = len(detection_result.faces)
-                best_face_result.faces = len(detection_result.faces)
-                best_face_result.quality = detection_result.faces[0].quality
-                best_face_result.acceptability = detection_result.faces[0].acceptability
-                best_face_result.liveness = -1
-                best_face_result.face_size = face_size
-                best_face_result.box_height = detection_result.faces[0].bounding_box.height()
-                best_face_result.box_width = detection_result.faces[0].bounding_box.width()
-                best_face_result.box_x = int(detection_result.faces[0].bounding_box.top_left.x)
-                best_face_result.box_y = int(detection_result.faces[0].bounding_box.top_left.y)
-                best_face_result.base64 = utils.convert_image_to_base64(cropped_face)
+                if cropped_face is not None:
+                    best_face_result.faces = len(detection_result.faces)
+                    best_face_result.faces = len(detection_result.faces)
+                    best_face_result.quality = detection_result.faces[0].quality
+                    best_face_result.acceptability = detection_result.faces[0].acceptability
+                    best_face_result.liveness = -1
+                    best_face_result.face_size = face_size
+                    best_face_result.box_height = detection_result.faces[0].bounding_box.height()
+                    best_face_result.box_width = detection_result.faces[0].bounding_box.width()
+                    best_face_result.box_x = int(detection_result.faces[0].bounding_box.top_left.x)
+                    best_face_result.box_y = int(detection_result.faces[0].bounding_box.top_left.y)
+                    best_face_result.base64 = utils.convert_image_to_base64(cropped_face)
 
         best_face_result.time = utils.get_datetime()
         return best_face_result

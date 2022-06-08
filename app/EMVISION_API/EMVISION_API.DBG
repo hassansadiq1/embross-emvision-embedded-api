@@ -1,0 +1,22 @@
+20220302 14:02:35.857 INFO     Started server process [7079]
+20220302 14:02:35.863 INFO     Waiting for application startup.
+20220302 14:02:35.864 INFO     Application startup complete.
+20220302 14:02:35.866 INFO     Uvicorn running on http://127.0.0.1:8825 (Press CTRL+C to quit)
+20220302 14:03:00.478 INFO     127.0.0.1:51262 - "GET /camera/stream/video_raw HTTP/1.1" 200
+20220302 14:03:14.570 INFO     Shutting down
+20220302 14:03:14.671 INFO     Waiting for application shutdown.
+20220302 14:03:14.672 INFO     Application shutdown complete.
+20220302 14:03:14.672 INFO     Finished server process [7079]
+20220302 14:03:52.935 INFO     Started server process [8269]
+20220302 14:03:52.939 INFO     Waiting for application startup.
+20220302 14:03:52.939 INFO     Application startup complete.
+20220302 14:03:52.940 INFO     Uvicorn running on http://127.0.0.1:8825 (Press CTRL+C to quit)
+20220302 14:03:54.850 INFO     127.0.0.1:51272 - "GET /docs HTTP/1.1" 200
+20220302 14:03:55.944 INFO     127.0.0.1:51272 - "GET /openapi.json HTTP/1.1" 200
+20220302 14:04:00.997 INFO     127.0.0.1:51272 - "POST /auth/token HTTP/1.1" 200
+20220302 14:04:11.140 INFO     127.0.0.1:51274 - "GET /camera/face?duration=0 HTTP/1.1" 200
+20220302 14:04:36.660 INFO     127.0.0.1:51284 - "GET /camera/face?duration=1 HTTP/1.1" 200
+20220302 14:04:47.921 INFO     Shutting down
+20220302 14:04:48.22 INFO     Waiting for application shutdown.
+20220302 14:04:48.23 INFO     Application shutdown complete.
+20220302 14:04:48.23 INFO     Finished server process [8269]

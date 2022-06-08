@@ -16,7 +16,15 @@ Emvision_API = APIRouter()
 @Emvision_API.get(
     "/camera/face",
     summary="Capture a cropped face from the camera",
-    description="Capture frames from the camera and return the best cropped face image in a given time.",
+    description="**MANDATORY!** - User has be authorised to access this API call.\t\t\n\n "
+                "- **Name**: Get Detected Face\t\t\n"
+                "- **Description**: This call internally uses configured face detection model to detect faces.\t\t\n"
+                "-  **Supported Face Detection Models**:\t\t\n"
+                "   -  Paravision Model\t\t\n"
+                "-  **Parameters**: \t\t\n"
+                "   -  duration = 0 returns the face detected in current captured frame.\t\t\n"
+                "   -  duration > 0 returns best face quality face detected in the given duration.\t\t\n"
+                "-  **Return**: FaceDetectionResult. refer to the schema or example below",
     response_model=utils.FaceDetectionResult,
     tags=["Camera"]
 )
@@ -34,6 +42,11 @@ async def get_face_image(duration: int,
 @Emvision_API.get(
     "/camera/image",
     summary="Capture a raw frame from the camera",
+    description="**MANDATORY!** - User has be authorised to access this API call.\t\t\n\n "
+                "- **Name**: Get Camera Image\t\t\n"
+                "- **Description**: This call returns the current frame captured.\t\t\n"
+                "-  **Parameters**: None\t\t\n"
+                "-  **Return**: RawFrame. refer to the schema or example below",
     response_model=utils.RawFrame,
     tags=["Camera"]
 )
@@ -47,6 +60,11 @@ def get_camera_image(current_user: utils.User = Depends(security.get_current_act
 @Emvision_API.get(
     "/camera/stream",
     summary="Get live steam URL of Camera",
+    description="**MANDATORY!** - User has be authorised to access this API call.\t\t\n\n "
+                "- **Name**: Get Camera Stream URL\t\t\n"
+                "- **Description**: This call returns URL to view live stream.\t\t\n"
+                "-  **Parameters**: None\t\t\n"
+                "-  **Return**: VideoStream. refer to the schema or example below",
     response_model=utils.VideoStream,
     tags=["Camera"]
 )
@@ -72,10 +90,16 @@ def get_camera_stream():
         raise HTTPException(status_code=404, detail="Camera offline")
 
 
-@Emvision_API.get("/camera/list",
-                  summary="List all the cameras",
-                  tags=["Camera"]
-                  )
+@Emvision_API.get(
+    "/camera/list",
+    summary="List all the cameras",
+    response_model=utils.CameraSettings,
+    description="- **Name**: Get Camera status detailed\t\t\n"
+                "- **Description**: This call returns the camera status with some camera settings.\t\t\n"
+                "-  **Parameters**: None\t\t\n"
+                "-  **Return**: CameraSettings. refer to the schema or example below",
+    tags=["Camera"]
+)
 async def get_camera_list():
     camera_list = get_camera_settings()
     camera_list.online = Camera.get_camera_status()
@@ -86,6 +110,15 @@ async def get_camera_list():
 @Emvision_API.post(
     "/compare/images",
     summary="Compare two face images",
+    description="**MANDATORY!** - User has be authorised to access this API call.\t\t\n\n "
+                "- **Name**: 1:1 compare\t\t\n"
+                "- **Description**: This call grabs both images and does face detection on both images and compares both faces to get similarity score ..\t\t\n"
+                "-  **Supported Face Detection Models**:\t\t\n"
+                "   -  Paravision Model\t\t\n"
+                "-  **Parameters**: \t\t\n"
+                "   -  img1_base64 \t\t\n"
+                "   -  img2_base64 \t\t\n"
+                "-  **Return**: ImageComparision. refer to the schema or example below",
     response_model=utils.ImageComparision,
     tags=["1:1 Compare"]
 )
@@ -100,6 +133,11 @@ async def compare_images(
 @Emvision_API.get(
     "/software/information",
     summary="shows required software information",
+    description="**MANDATORY!** - User has be authorised to access this API call.\t\t\n\n "
+                "- **Name**: software Information\t\t\n"
+                "- **Description**: This call returns software version information.\t\t\n"
+                "-  **Parameters**: None\t\t\n"
+                "-  **Return**: SoftwareInfo. refer to the schema or example below",
     response_model=utils.SoftwareInfo,
     tags=["software"]
 )
@@ -111,6 +149,11 @@ def get_software_info(current_user: utils.User = Depends(security.get_current_ac
 
 @Emvision_API.get(
     "/auth/me/",
+    description="**MANDATORY!** - User has be authorised to access this API call.\t\t\n\n "
+                "- **Name**: list authenticate users\t\t\n"
+                "- **Description**: This call returns all users available.\t\t\n"
+                "-  **Parameters**: None\t\t\n"
+                "-  **Return**: User. refer to the schema or example below",
     response_model=utils.User,
     tags=["Authentication"]
 )
@@ -122,6 +165,10 @@ async def read_users_me(
 
 @Emvision_API.post(
     "/auth/token",
+    description="- **Name**: get authorization token\t\t\n"
+                "- **Description**: This call returns token to the given user if user exists\t\t\n"
+                "-  **Parameters**: User name and Password are mandatory fields\t\t\n"
+                "-  **Return**: Token. refer to the schema or example below",
     response_model=utils.Token,
     tags=["Authentication"]
 )

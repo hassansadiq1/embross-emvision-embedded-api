@@ -14,7 +14,21 @@ get_raw_config_data()
 
 app = FastAPI(
     title="Emvision API",
-    description="Emvision API offers state-of-the-art face detection technology.",
+    openapi_url="/Emvision_API-" + get_software_info() + ".json",
+    description="**Summary:**\tEmvision API offers state-of-the-art face detection technology. "
+                "This is currently a light weight API to deal with Face detection and 1:1 comparision. "
+                "This API is agnostic and configured to support below face detection models.\t\t\n"
+                "-  **Supported Face Detection Models**:\t\t\n"
+                "   -  Paravision Model\t\t\n"
+                "-  **Loging**:\t\t\n "
+                "   - all the console and server logs are saved to app/EMVISION_API folder"
+                "-  **Services**:\t\t\n "
+                "   - Face Detection, \t\t\n "
+                "   - Raw Camera Image, \t\t\n "
+                "   - Live Camera Stream,\t\t\n "
+                "   - 1:1 Comparision,\t\t\n "
+                "   - camera Status\t\t\n"
+                "   - API software version information",
     version=get_software_info()
     )
 
