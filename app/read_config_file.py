@@ -24,6 +24,10 @@ def get_camera_settings():
         camera_config.frame_height = raw_json_data["camera"].get("height")
         camera_config.frame_width = raw_json_data["camera"].get("width")
         camera_config.rotation = raw_json_data["camera"].get("rotation_cw")
+        camera_config.brightness = raw_json_data["camera"].get("brightness")
+        camera_config.contrast = raw_json_data["camera"].get("contrast")
+        camera_config.hue = raw_json_data["camera"].get("hue")
+        camera_config.saturation = raw_json_data["camera"].get("saturation")
     else:
         raise Exception("config.jason file is None")
 

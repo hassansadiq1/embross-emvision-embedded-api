@@ -13,7 +13,11 @@
       "frame_rate": 30,
       "height": 720,
       "width": 1280,
-      "rotation_cw": 0
+      "rotation_cw": 0,
+      "brightness": 0,
+      "contrast": 36,
+      "hue": 0,
+      "saturation": 72
     },
   "server": {
       "host_url": "0.0.0.0",

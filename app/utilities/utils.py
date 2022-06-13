@@ -20,6 +20,10 @@ class CameraSettings(BaseModel):
     rotation: int = 0
     online: bool = False
     enabled: bool = True
+    brightness: int = 0
+    contrast: int = 36
+    hue: int = 0
+    saturation: int = 72
 
     class Config:
         schema_extra = {

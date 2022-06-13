@@ -49,14 +49,21 @@ class CameraThread(threading.Thread):
 
     def gstreamer_pipeline(self,
             device="/dev/video3", frame_rate=15,
-            capture_width=3840, capture_height=2160):
+            capture_width=3840, capture_height=2160,
+            brightness=0, contrast=36,
+            hue=0, saturation=72
+    ):
         return (
-                "v4l2src device=%s num-buffers=450 ! "
+                "v4l2src device=%s num-buffers=450 "
+                "brightness=%d contrast=%d hue=%d saturation=%d ! "
                 "video/x-raw, "
                 "width=(int)%d, height=(int)%d, "
                 "framerate=(fraction)%d/1 ! "
                 "videoconvert ! appsink"
-                % (device, capture_width,
+                % (device,
+                   brightness, contrast,
+                   hue, saturation,
+                   capture_width,
                    capture_height, frame_rate)
         )
 
@@ -66,7 +73,11 @@ class CameraThread(threading.Thread):
         pipeline = self.gstreamer_pipeline(device=self.camera_config.id,
                                            frame_rate=self.camera_config.frames_per_sec,
                                            capture_width=self.camera_config.frame_width,
-                                           capture_height=self.camera_config.frame_height)
+                                           capture_height=self.camera_config.frame_height,
+                                           brightness=self.camera_config.brightness,
+                                           contrast=self.camera_config.contrast,
+                                           hue=self.camera_config.hue,
+                                           saturation=self.camera_config.saturation)
         self.cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
         # self.cap.set(cv2.CAP_PROP_FPS, self._config.frames_per_sec)
         # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._config.frame_width)
